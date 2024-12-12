@@ -1,20 +1,34 @@
 const express = require("express");
-const bodyparser = require("body-parser");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const { databaseConnection } = require("../db/dbConnection");
-dotenv.config();
 const app = express();
-const PORT = process.env.PORT;
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(bodyparser.urlencoded({ extended: true }));
+const cors = require("cors");
 app.use(cors());
+const dotenv = require("dotenv");
+dotenv.config();
+const bodyparser = require("body-parser");
+app.use(bodyparser.urlencoded({ extended: true }));
+// app.use(express.static("uploads"));
 
-app.listen(PORT, (success) => {
-  if (success) {
-    console.log(`Server is running on port ${PORT}`);
+const { databaseConnection } = require("../db/dbConnection");
+const fileImageRoutes = require("../routes/fileImageUploadROutes");
+const PORT = process.env.PORT || 3001;
+
+app.use("/imagefiles", fileImageRoutes);
+
+app.use("/", (req, res) => {
+  res.send(`
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #282c34; color: white; font-family: Arial, sans-serif; font-size: 24px;">
+      Welcome to Imageflix
+    </div>
+  `);
+});
+
+app.listen(3001, (error) => {
+  if (error) {
+    console.log(`Server is not running ${error}`);
   } else {
-    console.log("Server is not running");
+    console.log(`Server Running On ${PORT}`);
   }
 });
 databaseConnection();
